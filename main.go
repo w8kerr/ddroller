@@ -82,6 +82,11 @@ func main() {
   return
 }
 
+//ParseRoll takes a string in Dice Notation
+//( https://en.wikipedia.org/wiki/Dice_notation )
+//and parses that string into constituent parts with semantic meaning.
+//It returns a RollDef struct containing that information,
+//and an error on failure.
 func ParseRoll(request string) (def RollDef, err int) {
   roll_matcher, _ := regexp.Compile(`(?P<count>\d+)d(?P<sides>\d+)`)
 
@@ -110,6 +115,25 @@ func ParseRoll(request string) (def RollDef, err int) {
   }
 }
 
+//DisplayParseError displays to the command line error messages based on the
+//errors that can be returned from ParseRoll.
+func DisplayParseError(err int, def RollDef) {
+  switch err {
+    case RollError_UnsupportedFormat:
+      fmt.Println("Your request was not in valid DnD roll syntax.\n" +
+      "Format your request in the style of 2d20,\n" +
+      "which rolls two dice with 20 sides each.")
+    case RollError_RequestTooLarge:
+      fmt.Println("Cannot roll more than ", DiceCountLimit, " dice.")
+    case RollError_UnsupportedDice:
+      fmt.Println("Cannot roll dice with ", def.sides, " sides.")
+  }
+}
+
+//PerformRoll takes the definition of a dice roll as a RollDef struct,
+//and performs that roll using a random number generator.
+//It returns information about the results, including the sum total of all dice
+//rolled as well as the value of each individual die, in a RollResult struct.
 func PerformRoll(def RollDef) RollResult {
   var res RollResult
   res.rolls = make([]int, 0, def.count)
@@ -131,17 +155,4 @@ func PerformRoll(def RollDef) RollResult {
   }
 
   return res
-}
-
-func DisplayParseError(err int, def RollDef) {
-  switch err {
-    case RollError_UnsupportedFormat:
-      fmt.Println("Your request was not in valid DnD roll syntax.\n" +
-      "Format your request in the style of 2d20,\n" +
-      "which rolls two dice with 20 sides each.")
-    case RollError_RequestTooLarge:
-      fmt.Println("Cannot roll more than ", DiceCountLimit, " dice.")
-    case RollError_UnsupportedDice:
-      fmt.Println("Cannot roll dice with ", def.sides, " sides.")
-  }
 }
