@@ -1,12 +1,11 @@
 package main
 import (
-  "fmt"
-  "bufio"
-  "os"
   "regexp"
   "strconv"
   "math/rand"
   "time"
+  "github.com/gin-gonic/gin"
+  "net/http"
 )
 
 //Error values for parsing roll requests.
@@ -56,30 +55,33 @@ func init() {
 }
 
 func main() {
-  scanner := bufio.NewReader(os.Stdin)
-  var roll_request string
+  server := gin.Default()
 
-  fmt.Print("Roll: ")
-  roll_request, _ = scanner.ReadString('\n')
+  //server.GET("/roll/", SP_RollPrompt) //Not written yet
+  server.GET("/roll/:roll_req", SP_RollResponse)
+  server.Run(":8080")
+}
+
+//Function prefix "SP_" means "serve page"
+func SP_RollResponse(context *gin.Context) {
+  var response string
+  roll_request := context.Param("roll_req")
+
+  response += "Roll: " + roll_request + "\n"
 
   roll_def, err := ParseRoll(roll_request)
   if err != -1 {
-    DisplayParseError(err, roll_def)
+    response += GetParseError(err, roll_def) + "\n"
+  } else {
+    roll_result := PerformRoll(roll_def)
 
-    //Program cannot continue after parsing error, so stop execution
-    scanner.ReadString('\n')
-    return
+    for i, roll := range roll_result.rolls {
+      response += "Roll " + strconv.Itoa(i+1) + ": " + strconv.Itoa(roll) + "\n"
+    }
+    response += "\nTotal: " + strconv.Itoa(roll_result.total) + "\n"
   }
 
-  roll_result := PerformRoll(roll_def)
-
-  for i, roll := range roll_result.rolls {
-    fmt.Println("Roll ", i+1, ": ", roll)
-  }
-  fmt.Println("\nTotal: ", roll_result.total)
-
-  scanner.ReadString('\n')
-  return
+  context.String(http.StatusOK, response)
 }
 
 //ParseRoll takes a string in Dice Notation
@@ -115,19 +117,22 @@ func ParseRoll(request string) (def RollDef, err int) {
   }
 }
 
-//DisplayParseError displays to the command line error messages based on the
+//GetParseError returns a string containing an error message based on the
 //errors that can be returned from ParseRoll.
-func DisplayParseError(err int, def RollDef) {
+func GetParseError(err int, def RollDef) (err_text string) {
+  err_text = "Unknown error."
   switch err {
     case RollError_UnsupportedFormat:
-      fmt.Println("Your request was not in valid DnD roll syntax.\n" +
+      err_text = "Your request was not in valid DnD roll syntax.\n" +
       "Format your request in the style of 2d20,\n" +
-      "which rolls two dice with 20 sides each.")
+      "which rolls two dice with 20 sides each."
     case RollError_RequestTooLarge:
-      fmt.Println("Cannot roll more than ", DiceCountLimit, " dice.")
+      err_text = "Cannot roll more than " + strconv.Itoa(DiceCountLimit) + " dice."
     case RollError_UnsupportedDice:
-      fmt.Println("Cannot roll dice with ", def.sides, " sides.")
+      err_text = "Cannot roll dice with " + strconv.Itoa(def.sides) + " sides."
   }
+
+  return err_text
 }
 
 //PerformRoll takes the definition of a dice roll as a RollDef struct,
