@@ -1,0 +1,16 @@
+<html>
+  <head>
+  </head>
+  <body>
+    {{ if .err_text }}
+    <p>{{ .err_text }}</p>
+    {{ else }}
+    <ul>
+      {{ range $i, $roll := .result.rolls}}
+      <li>Roll {{ $i }}: {{ $roll }}</li>
+      {{ end }}
+      <p>Total: {{ .result.total }}</p>
+    </ul>
+    {{ end }}
+  </body>
+</html>

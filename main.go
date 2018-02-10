@@ -56,6 +56,7 @@ func init() {
 
 func main() {
   server := gin.Default()
+  server.LoadHTMLGlob("templates/*")
 
   //server.GET("/roll/", SP_RollPrompt) //Not written yet
   server.GET("/roll/:roll_req", SP_RollResponse)
@@ -65,23 +66,24 @@ func main() {
 //Function prefix "SP_" means "serve page"
 func SP_RollResponse(context *gin.Context) {
   var response string
+  response_JSON := make(gin.H)
   roll_request := context.Param("roll_req")
 
-  response += "Roll: " + roll_request + "\n"
+  response += "\n    Roll: " + roll_request + "</br>\n"
 
   roll_def, err := ParseRoll(roll_request)
   if err != -1 {
-    response += GetParseError(err, roll_def) + "\n"
+    response_JSON["err_text"] = GetParseError(err, roll_def)
   } else {
     roll_result := PerformRoll(roll_def)
-
-    for i, roll := range roll_result.rolls {
-      response += "Roll " + strconv.Itoa(i+1) + ": " + strconv.Itoa(roll) + "\n"
+    response_JSON["result"] = gin.H{
+      "rolls": roll_result.rolls,
+      "total": roll_result.total,
     }
-    response += "\nTotal: " + strconv.Itoa(roll_result.total) + "\n"
   }
 
-  context.String(http.StatusOK, response)
+  context.HTML(http.StatusOK, "roll.tmpl", response_JSON)
+  //context.HTML(http.StatusOK, "roll.tpml", gin.H{})
 }
 
 //ParseRoll takes a string in Dice Notation
@@ -112,6 +114,7 @@ func ParseRoll(request string) (def RollDef, err int) {
 
     def.modifier = 0
     def.success = 0
+    def.reverse_success = false
 
     return def, err
   }
@@ -151,12 +154,14 @@ func PerformRoll(def RollDef) RollResult {
   }
 
   res.total = roll_total + def.modifier
-  if def.reverse_success {
-    //Reversed success: succeed if the total is <= the threshold
-    res.succeeded = res.total <= def.success
-  } else {
-    //Normal success: succeed if the total is >= the threshold
-    res.succeeded = res.total >- def.success
+  if def.success != 0 {
+    if def.reverse_success {
+      //Reversed success: succeed if the total is <= the threshold
+      res.succeeded = res.total <= def.success
+    } else {
+      //Normal success: succeed if the total is >= the threshold
+      res.succeeded = res.total >- def.success
+    }
   }
 
   return res
