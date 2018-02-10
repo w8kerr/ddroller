@@ -65,11 +65,8 @@ func main() {
 
 //Function prefix "SP_" means "serve page"
 func SP_RollResponse(context *gin.Context) {
-  var response string
   response_JSON := make(gin.H)
   roll_request := context.Param("roll_req")
-
-  response += "\n    Roll: " + roll_request + "</br>\n"
 
   roll_def, err := ParseRoll(roll_request)
   if err != -1 {
@@ -83,7 +80,6 @@ func SP_RollResponse(context *gin.Context) {
   }
 
   context.HTML(http.StatusOK, "roll.tmpl", response_JSON)
-  //context.HTML(http.StatusOK, "roll.tpml", gin.H{})
 }
 
 //ParseRoll takes a string in Dice Notation
