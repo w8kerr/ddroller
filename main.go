@@ -6,6 +6,12 @@ import (
   "time"
   "github.com/gin-gonic/gin"
   "net/http"
+  "io/ioutil"
+  "encoding/json"
+  "gopkg.in/mgo.v2"
+  "fmt"
+  "crypto/tls"
+  "net"
 )
 
 //Error values for parsing roll requests.
@@ -50,11 +56,36 @@ type RollResult struct {
   succeeded bool
 }
 
+//Definition for a roll result record.
+//Includes a roll result plus data about who performed the roll.
+type RollRecord struct {
+  Result RollResult `bson:"result"`
+  User string `bson:"user"`
+  Time string `bson:"time"`
+}
+
+//Definition for a username/password pair.
+//Used to load and pass database credentials.
+//Fields must be public for the json library to do its magic
+type Credentials struct {
+  Username string `json:"username"`
+  Password string `json:"password"`
+}
+
+//It's difficult to pass this to route handler functions, so we'll just make it
+//a global variable for now. Will probably need to be refactored eventually
+var mongo *mgo.Session
+
 func init() {
   rand.Seed(time.Now().UnixNano())
 }
 
 func main() {
+  //Connect to MongoDB database
+  mongo = ConnectToDatabase()
+  defer mongo.Close()
+
+  //Run the web server
   server := gin.Default()
   server.LoadHTMLGlob("templates/*")
 
@@ -76,6 +107,18 @@ func SP_RollResponse(context *gin.Context) {
     response_JSON["result"] = gin.H{
       "rolls": roll_result.rolls,
       "total": roll_result.total,
+    }
+
+    var roll_record RollRecord
+    roll_record.Result = roll_result
+    roll_record.User = "w8kerr" //Eventually, this should be variable; hardcoded for now
+    roll_record.Time = time.Now().Format(time.RFC822)
+
+    //Save the roll in the database
+    db_roll_c := mongo.DB("ddroller-dev").C("rolls")
+    err := db_roll_c.Insert(&roll_record)
+    if err != nil {
+      panic(err.Error())
     }
   }
 
@@ -161,4 +204,52 @@ func PerformRoll(def RollDef) RollResult {
   }
 
   return res
+}
+
+func ConnectToDatabase() *mgo.Session {
+  db_login := LoadDatabaseCredentials("./database.json")
+  fmt.Println("Username: ", db_login.Username)
+  fmt.Println("Password: ", db_login.Password)
+
+  tls_config := &tls.Config{}
+  db_info := &mgo.DialInfo{
+    Addrs:    []string{
+      "cluster0-shard-00-00-pmam7.mongodb.net:27017",
+      "cluster0-shard-00-01-pmam7.mongodb.net:27017",
+      "cluster0-shard-00-02-pmam7.mongodb.net:27017",
+    },
+    Timeout:  20 * time.Second,
+    Username: db_login.Username,
+    Password: db_login.Password,
+    //MongoDB Atlas requires TLS so we have to provide a handler to Dial it
+    //with that connection first. Or else it refuses all connections -.-
+    DialServer: func(address *mgo.ServerAddr) (net.Conn, error) {
+      return tls.Dial("tcp", address.String(), tls_config)
+    },
+  }
+
+  session, err := mgo.DialWithInfo(db_info)
+  if err != nil {
+    panic(err.Error())
+  }
+
+  session.SetMode(mgo.Monotonic, true)
+  if err != nil {
+    panic(err.Error())
+  }
+
+  return session
+}
+
+//LoadDatabaseCredentials loads a username/password pair from a JSON file and
+//returns it as a Credentials struct.
+func LoadDatabaseCredentials(file_path string) Credentials {
+  file_content, err := ioutil.ReadFile(file_path)
+  if err != nil {
+    panic(err.Error())
+  }
+
+  var login Credentials
+  json.Unmarshal(file_content, &login)
+  return login
 }
