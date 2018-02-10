@@ -9,6 +9,7 @@ import (
   "io/ioutil"
   "encoding/json"
   "gopkg.in/mgo.v2"
+  "gopkg.in/mgo.v2/bson"
   "fmt"
   "crypto/tls"
   "net"
@@ -40,36 +41,38 @@ var SupportedDice = map[int]bool {
 //and succeed if the result is above [success],
 //or below [success] if [reverse_success] is true.
 type RollDef struct {
-  count int
-  sides int
-  modifier int
-  success int
-  reverse_success bool
+  Count int             `bson:"count"`
+  Sides int             `bson:"sides"`
+  Modifier int          `bson:"modifier"`
+  Success int           `bson:"success"`
+  Reverse_success bool  `bson:"reverse_success"`
 }
 
 //Definition for a roll result.
 //[rolls] contains each individual roll, [total] contains the sum including the
 //roll modifier, and [succeeded] is true if the roll met its success threshold.
 type RollResult struct {
-  rolls []int
-  total int
-  succeeded bool
+  Rolls []int           `bson:"rolls"`
+  Total int             `bson:"total"`
+  Succeeded bool        `bson:"succeeded"`
 }
 
 //Definition for a roll result record.
 //Includes a roll result plus data about who performed the roll.
 type RollRecord struct {
-  Result RollResult `bson:"result"`
-  User string `bson:"user"`
-  Time string `bson:"time"`
+  Request RollDef       `bson:"request"`
+  Result RollResult     `bson:"result"`
+  User string           `bson:"user"`
+  Time string           `bson:"time"`
+  SeqID int64             `bson:"seqid"`
 }
 
 //Definition for a username/password pair.
 //Used to load and pass database credentials.
 //Fields must be public for the json library to do its magic
 type Credentials struct {
-  Username string `json:"username"`
-  Password string `json:"password"`
+  Username string       `json:"username"`
+  Password string       `json:"password"`
 }
 
 //It's difficult to pass this to route handler functions, so we'll just make it
@@ -89,13 +92,25 @@ func main() {
   server := gin.Default()
   server.LoadHTMLGlob("templates/*")
 
+  //These pages are constructed server-side and served without JS
+  //Templates are in Gin template syntax (almost like Hugo but not quite)
+  //Function prefix "SP_" means "serve page"
   //server.GET("/roll/", SP_RollPrompt) //Not written yet
-  server.GET("/roll/:roll_req", SP_RollResponse)
+  server.GET("/roll/:roll_req", SP_Roll)
+
+  //These pages are served static, then filled by AngularJS using AJAX calls
+  //Templates are in AngularJS syntax
+  server.StaticFile("/rolls", "./html/roll_list.html")
+
+  //AJAX calls for data filling
+  //Function prefix "SJ_" means "serve JSON"
+  server.GET("/rolls.json", SJ_RollList)
+
   server.Run(":8080")
 }
 
-//Function prefix "SP_" means "serve page"
-func SP_RollResponse(context *gin.Context) {
+//SP_Roll serves the page for performing a roll.
+func SP_Roll(context *gin.Context) {
   response_JSON := make(gin.H)
   roll_request := context.Param("roll_req")
 
@@ -105,24 +120,77 @@ func SP_RollResponse(context *gin.Context) {
   } else {
     roll_result := PerformRoll(roll_def)
     response_JSON["result"] = gin.H{
-      "rolls": roll_result.rolls,
-      "total": roll_result.total,
+      "rolls": roll_result.Rolls,
+      "total": roll_result.Total,
     }
 
     var roll_record RollRecord
     roll_record.Result = roll_result
+    roll_record.Request = roll_def
     roll_record.User = "w8kerr" //Eventually, this should be variable; hardcoded for now
     roll_record.Time = time.Now().Format(time.RFC822)
+    roll_record.SeqID = GetNextRollID()
 
     //Save the roll in the database
-    db_roll_c := mongo.DB("ddroller-dev").C("rolls")
-    err := db_roll_c.Insert(&roll_record)
+    c := mongo.DB("ddroller-dev").C("rolls")
+    err := c.Insert(&roll_record)
     if err != nil {
       panic(err.Error())
     }
   }
 
   context.HTML(http.StatusOK, "roll.tmpl", response_JSON)
+}
+
+//Responses are limited to a certain number of rolls per call.
+const RollListResultLimit = 20
+//SJ_RollList serves JSON containing a historical list of rolls performed
+//server-wide. Parameters can filter by user or recency.
+func SJ_RollList(context *gin.Context) {
+  var user, since_string, num_string string
+  var since int64 = 0
+  num_records := RollListResultLimit
+
+  user = context.Query("user")
+  since_string = context.Query("since")
+  num_string = context.Query("n")
+
+  since, _ = strconv.ParseInt(since_string, 10, 64)
+  parsed_num, _ := strconv.Atoi(num_string)
+  if parsed_num > 0 && parsed_num < RollListResultLimit {
+    num_records = parsed_num
+  }
+
+  var results []RollRecord
+  query_doc := make(bson.M)
+  var sort_order string
+  if user != "" {
+    //Get only the records matching the specified user
+    query_doc["user"] = user
+  }
+  if since != 0 {
+    //Get only records after the specified id
+    query_doc["seqid"] = bson.M{"$gt": since}
+    //Because there is a defined starting point, sort in ascending order
+    sort_order = "seqid"
+  } else {
+    //Because there is no defined starting point, we want most recent records,
+    //so sort in descending order
+    sort_order = "-seqid"
+  }
+
+  c := mongo.DB("ddroller-dev").C("rolls")
+  iter := c.Find(query_doc).
+    Sort(sort_order).
+    Limit(num_records).
+    Iter()
+  err := iter.All(&results)
+
+  if err != nil {
+    context.SecureJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+  } else {
+    context.SecureJSON(http.StatusOK, results)
+  }
 }
 
 //ParseRoll takes a string in Dice Notation
@@ -141,19 +209,19 @@ func ParseRoll(request string) (def RollDef, err int) {
     count, _ := strconv.Atoi(parsed_request[1])
     sides, _ := strconv.Atoi(parsed_request[2])
 
-    def.count = count
+    def.Count = count
     if count > DiceCountLimit {
       err = RollError_RequestTooLarge
     }
 
-    def.sides = sides
+    def.Sides = sides
     if !SupportedDice[sides] {
       err = RollError_UnsupportedDice
     }
 
-    def.modifier = 0
-    def.success = 0
-    def.reverse_success = false
+    def.Modifier = 0
+    def.Success = 0
+    def.Reverse_success = false
 
     return def, err
   }
@@ -171,7 +239,7 @@ func GetParseError(err int, def RollDef) (err_text string) {
     case RollError_RequestTooLarge:
       err_text = "Cannot roll more than " + strconv.Itoa(DiceCountLimit) + " dice."
     case RollError_UnsupportedDice:
-      err_text = "Cannot roll dice with " + strconv.Itoa(def.sides) + " sides."
+      err_text = "Cannot roll dice with " + strconv.Itoa(def.Sides) + " sides."
   }
 
   return err_text
@@ -183,23 +251,23 @@ func GetParseError(err int, def RollDef) (err_text string) {
 //rolled as well as the value of each individual die, in a RollResult struct.
 func PerformRoll(def RollDef) RollResult {
   var res RollResult
-  res.rolls = make([]int, 0, def.count)
+  res.Rolls = make([]int, 0, def.Count)
 
   var roll_total int
-  for i := 1; i <= def.count; i++ {
-    one_roll := rand.Intn(def.sides) + 1
-    res.rolls = append(res.rolls, one_roll)
+  for i := 1; i <= def.Count; i++ {
+    one_roll := rand.Intn(def.Sides) + 1
+    res.Rolls = append(res.Rolls, one_roll)
     roll_total += one_roll
   }
 
-  res.total = roll_total + def.modifier
-  if def.success != 0 {
-    if def.reverse_success {
+  res.Total = roll_total + def.Modifier
+  if def.Success != 0 {
+    if def.Reverse_success {
       //Reversed success: succeed if the total is <= the threshold
-      res.succeeded = res.total <= def.success
+      res.Succeeded = res.Total <= def.Success
     } else {
       //Normal success: succeed if the total is >= the threshold
-      res.succeeded = res.total >- def.success
+      res.Succeeded = res.Total >- def.Success
     }
   }
 
@@ -234,11 +302,35 @@ func ConnectToDatabase() *mgo.Session {
   }
 
   session.SetMode(mgo.Monotonic, true)
-  if err != nil {
-    panic(err.Error())
-  }
 
   return session
+}
+
+//Definition for a struct to hold the sequential roll id counter.
+//It seems over-engineered to define a struct for this, but I can't figure out
+//how to retrieve data from mgo without reading it into a struct
+type Int64Container struct {
+  Value int64         `bson:"counter"`
+}
+
+//GetNextRollID provides a unique and sequential integer ID for roll records.
+//Uniqueness and seqentialness are ensured by storing this data in database.
+func GetNextRollID() int64 {
+  var id Int64Container
+
+  c := mongo.DB("ddroller-dev").C("counters")
+  _, err := c.Find(bson.M{"type": "rolls"}).
+    Select(bson.M{"counter": 1}).
+    Apply(mgo.Change{
+      Update: bson.M{
+        "$inc": bson.M{"counter": 1},
+      },
+      ReturnNew: true,
+    }, &id)
+  if err != nil {
+    panic(err)
+  }
+  return id.Value
 }
 
 //LoadDatabaseCredentials loads a username/password pair from a JSON file and
