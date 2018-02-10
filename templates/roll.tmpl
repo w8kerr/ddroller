@@ -2,15 +2,12 @@
   <head>
   </head>
   <body>
-    {{ if .err_text }}
-    <p>{{ .err_text }}</p>
-    {{ else }}
+    <p>Sequence ID: {{ .SeqID }}</p>
     <ul>
-      {{ range $i, $roll := .result.rolls}}
-      <li>Roll {{ $i }}: {{ $roll }}</li>
+      {{ range $i, $roll := .Result.Rolls}}
+      <li>Roll {{ add $i 1 }}: {{ $roll }}</li>
       {{ end }}
-      <p>Total: {{ .result.total }}</p>
     </ul>
-    {{ end }}
+    <p>Total: {{ .Result.Total }}</p>
   </body>
 </html>

@@ -13,6 +13,8 @@ import (
   "fmt"
   "crypto/tls"
   "net"
+  "strings"
+  "html/template"
 )
 
 //Error values for parsing roll requests.
@@ -64,7 +66,7 @@ type RollRecord struct {
   Result RollResult     `bson:"result"`
   User string           `bson:"user"`
   Time string           `bson:"time"`
-  SeqID int64             `bson:"seqid"`
+  SeqID int64           `bson:"seqid"`
 }
 
 //Definition for a username/password pair.
@@ -90,6 +92,7 @@ func main() {
 
   //Run the web server
   server := gin.Default()
+  server.SetFuncMap(template.FuncMap{"add": AddTwoNumbers})
   server.LoadHTMLGlob("templates/*")
 
   //These pages are constructed server-side and served without JS
@@ -97,6 +100,7 @@ func main() {
   //Function prefix "SP_" means "serve page"
   //server.GET("/roll/", SP_RollPrompt) //Not written yet
   server.GET("/roll/:roll_req", SP_Roll)
+  server.GET("/rolled/:roll_id", SP_RollPermalink)
 
   //These pages are served static, then filled by AngularJS using AJAX calls
   //Templates are in AngularJS syntax
@@ -111,25 +115,23 @@ func main() {
 
 //SP_Roll serves the page for performing a roll.
 func SP_Roll(context *gin.Context) {
-  response_JSON := make(gin.H)
   roll_request := context.Param("roll_req")
 
   roll_def, err := ParseRoll(roll_request)
   if err != -1 {
-    response_JSON["err_text"] = GetParseError(err, roll_def)
+    context.HTML(http.StatusBadRequest, "error.tmpl", gin.H{
+      "err_msg": GetParseError(err, roll_def),
+    })
   } else {
     roll_result := PerformRoll(roll_def)
-    response_JSON["result"] = gin.H{
-      "rolls": roll_result.Rolls,
-      "total": roll_result.Total,
-    }
 
-    var roll_record RollRecord
-    roll_record.Result = roll_result
-    roll_record.Request = roll_def
-    roll_record.User = "w8kerr" //Eventually, this should be variable; hardcoded for now
-    roll_record.Time = time.Now().Format(time.RFC822)
-    roll_record.SeqID = GetNextRollID()
+    roll_record := RollRecord{
+      Result: roll_result,
+      Request: roll_def,
+      User: "w8kerr", //Eventually, this should be variable; hardcoded for now
+      Time: time.Now().Format(time.RFC822),
+      SeqID: GetNextRollID(),
+    }
 
     //Save the roll in the database
     c := mongo.DB("ddroller-dev").C("rolls")
@@ -137,9 +139,21 @@ func SP_Roll(context *gin.Context) {
     if err != nil {
       panic(err.Error())
     }
-  }
 
-  context.HTML(http.StatusOK, "roll.tmpl", response_JSON)
+    context.HTML(http.StatusOK, "roll.tmpl", roll_record)
+  }
+}
+
+//SP_Roll serves the permalink record for a previous roll.
+func SP_RollPermalink(context *gin.Context) {
+  slug := context.Param("roll_id")
+  id := SlugToID(slug)
+
+  var result RollRecord
+  c := mongo.DB("ddroller-dev").C("rolls")
+  c.Find(bson.M{"seqid": id}).One(&result)
+
+  context.HTML(http.StatusOK, "roll.tmpl", result)
 }
 
 //Responses are limited to a certain number of rolls per call.
@@ -333,6 +347,23 @@ func GetNextRollID() int64 {
   return id.Value
 }
 
+const MinimumSlugSize = 4
+//IDToSlug takes an int64 and converts it to a Base 36, padded to at least 4
+//characters. These are used for permalink URLS
+func IDToSlug(id int64) (slug string) {
+  slug = strconv.FormatInt(id, 36)
+  if len(slug) < MinimumSlugSize {
+    slug = strings.Repeat("0", MinimumSlugSize - len(slug)) + slug
+  }
+  return slug
+}
+
+//SlugToID takes a Base 36 string and converts it to an int64
+func SlugToID(slug string) (id int64) {
+  id, _ = strconv.ParseInt(slug, 36, 64)
+  return id
+}
+
 //LoadDatabaseCredentials loads a username/password pair from a JSON file and
 //returns it as a Credentials struct.
 func LoadDatabaseCredentials(file_path string) Credentials {
@@ -344,4 +375,10 @@ func LoadDatabaseCredentials(file_path string) Credentials {
   var login Credentials
   json.Unmarshal(file_content, &login)
   return login
+}
+
+//AddTwoNumbers adds two numbers. Why? Because the html templater needs this to
+//be able to add things. Very annoying that that isn't possible by default.
+func AddTwoNumbers(first int, second int) int {
+  return first + second
 }
