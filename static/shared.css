@@ -1,0 +1,98 @@
+
+.prevent-transitions {
+  -webkit-transition: none !important;
+  transition: none !important;
+}
+
+div.page {
+  width: 960px;
+  margin: auto;
+}
+
+.header {
+  position: relative;
+  margin: auto;
+  background-image: url("/static/img/header.svg");
+  width: 960px;
+  height: 160px;
+}
+
+.header-line1a {
+  position: absolute;
+  left: 418px;
+  bottom: 80px;
+}
+.header-line1b {
+  position: absolute;
+  left: 464px;
+  bottom: 79px;
+}
+.header-line1c {
+  position: absolute;
+  left: 751px;
+  bottom: 79px;
+}
+
+.header-line2a-above {
+  position: absolute;
+  left: 418px;
+  bottom: 46px;
+}
+.header-line2a-below {
+  position: absolute;
+  left: 418px;
+  top: calc(100% - 44px);
+}
+.header-line2b-above {
+  position: absolute;
+  left: 560px;
+  bottom: 46px;
+}
+.header-line2b-below {
+  position: absolute;
+  left: 560px;
+  top: calc(100% - 44px);
+}
+.header-line2c-above {
+  position: absolute;
+  left: 751px;
+  bottom: 46px;
+}
+.header-line2c-below {
+  position: absolute;
+  left: 751px;
+  top: calc(100% - 44px);
+}
+
+input.roll-input {
+  height: 29px;
+  width: 284px;
+  padding-left: 3px;
+  padding-top: 3px;
+  padding-bottom: 0px;
+  font-size: 22px;
+  border: 0;
+}
+input.roll-input:focus {
+}
+input.roll-input::placeholder {
+  opacity: 0.2;
+}
+
+.header-link {
+  font-size: 22px;
+  color: black;
+  text-decoration: none;
+}
+.hover-underline {
+  -webkit-transition: box-shadow 0.2s;
+  transition: box-shadow 0.2s;
+}
+.hover-underline:hover {
+  box-shadow: 0 6px 0 -4.5px black;
+}
+.header-label {
+  font-size: 14px;
+  display: inline;
+  vertical-align: bottom;
+}

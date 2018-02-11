@@ -97,9 +97,9 @@ func main() {
   server.LoadHTMLGlob("templates/*")
 
   //These pages are constructed server-side and served without JS
-  //Templates are in Gin template syntax (almost like Hugo but not quite)
+  //Templates are in Go's default HTML template syntax
   //Function prefix "SP_" means "serve page"
-  //server.GET("/roll/", SP_RollPrompt) //Not written yet
+  //server.GET("/", SP_RollPrompt) //Not written yet
   server.GET("/roll/:roll_req", SP_Roll)
   server.GET("/rolled/:roll_id", SP_RollPermalink)
 
@@ -110,6 +110,9 @@ func main() {
   //AJAX calls for data filling
   //Function prefix "SJ_" means "serve JSON"
   server.GET("/rolls.json", SJ_RollList)
+
+  //Simple static assets
+  server.Static("/static", "./static")
 
   server.Run(":8080")
 }

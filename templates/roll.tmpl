@@ -1,14 +1,23 @@
 <html>
   <head>
+    <link rel="stylesheet" type="text/css" href="/static/shared.css">
   </head>
-  <body>
-    <p>Sequence ID: |< .SeqID >|</p>
-    <ul>
-      |< range $i, $roll := .Result.Rolls >|
-      <li>Roll |< add $i 1 >|: |< $roll >|</li>
-      |< end >|
-    </ul>
-    <p>Total: |< .Result.Total >|</p>
-    <p>{{ Now AngularJS can deal with these tags on its own }}</p>
+  <body class="prevent-transitions">
+    <div id="body" class="page">
+      |< template "header" >|
+      <div class="fancy-box">
+        <p>Sequence ID: |< .SeqID >|</p>
+        <ul>
+          |< range $i, $roll := .Result.Rolls >|
+          <li>Roll |< add $i 1 >|: |< $roll >|</li>
+          |< end >|
+        </ul>
+        <p>Total: |< .Result.Total >|</p>
+        <p>{{ Now AngularJS can deal with these tags on its own }}</p>
+      </div>
+    </div>
+  <script>
+    document.getElementById("body").classList.remove("prevent-transitions")
+  </script>
   </body>
 </html>
