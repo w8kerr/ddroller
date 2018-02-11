@@ -96,3 +96,14 @@ input.roll-input::placeholder {
   display: inline;
   vertical-align: bottom;
 }
+
+.page-box {
+  border: 2px solid transparent;
+  border-image-source: url("/static/img/page.svg");
+  border-image-slice: 67;
+  border-image-width: 30;
+  border-image-repeat: repeat;
+  margin: auto;
+  width: calc(100% - 192px);
+  padding: 50px 70px 20px;
+}
