@@ -2,12 +2,13 @@
   <head>
   </head>
   <body>
-    <p>Sequence ID: {{ .SeqID }}</p>
+    <p>Sequence ID: |< .SeqID >|</p>
     <ul>
-      {{ range $i, $roll := .Result.Rolls}}
-      <li>Roll {{ add $i 1 }}: {{ $roll }}</li>
-      {{ end }}
+      |< range $i, $roll := .Result.Rolls >|
+      <li>Roll |< add $i 1 >|: |< $roll >|</li>
+      |< end >|
     </ul>
-    <p>Total: {{ .Result.Total }}</p>
+    <p>Total: |< .Result.Total >|</p>
+    <p>{{ Now AngularJS can deal with these tags on its own }}</p>
   </body>
 </html>

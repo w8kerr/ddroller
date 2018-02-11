@@ -93,6 +93,7 @@ func main() {
   //Run the web server
   server := gin.Default()
   server.SetFuncMap(template.FuncMap{"add": AddTwoNumbers})
+  server.Delims("|<", ">|")
   server.LoadHTMLGlob("templates/*")
 
   //These pages are constructed server-side and served without JS
