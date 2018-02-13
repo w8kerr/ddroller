@@ -9,8 +9,8 @@
       |< template "header" >|
       <div class="page-box page-layout">
         <div class="layout1">
-          <div class="large-labeled">
-            |< .Request.Count >|d|< .Request.Sides >|
+          <div class="large-labeled flex-vertical-center">
+            <div class="large-labeled-content">|< .Request.Text >|</div>
             <div class="large-labeled-label">REQUEST</div>
           </div>
         </div>
@@ -19,7 +19,7 @@
             <div style="flex-basis: 50%;">
               <div class="featured-number">
                 <div class="featured-number-number">|< .Request.Count >|</div>
-                <div class="featured-number-label">NUMBER OF DICE</div>
+                <div class="featured-number-label flex-vertical-center">NUMBER OF DICE</div>
               </div>
             </div>
             <div style="flex-basis: 50%;">
@@ -55,19 +55,29 @@
           </div>
         </div>
         <div class="layout3">
-          <div class="fancy">
-            Some stuff will go here soon
+          <div class="fancy flex-vertical-center">
+            <div class="dice-pile">
+            |< $sides := .Request.Sides >|
+            |< $basis := (.Request.Count | dicebasis) >|
+            |< range .Result.Rolls >|
+              <div class="die-and-value" style="flex-basis: calc(|< $basis >|% - 16px);">
+                <div class="die-value flex-vertical-center" style="background-image: url('/static/img/d|< $sides >|.svg')">
+                  <div class="d|< $sides >|-adjust">|< . >|</div>
+                </div>
+              </div>
+            |< end >|
+            </div>
           </div>
         </div>
         <div class="layout4">
           <div class="ripped-center">
-            <div class="ripped-center-above hover-underline">◈This Roll</div>
+            <a class="ripped-center-above hover-underline" href="/rolled/|< .SeqID | slug >|">◈This Roll</a>
             <div class="ripped-center-line"></div>
             <div class="ripped-center-below">PERMANENT LINK</div>
           </div>
           <div class="ripped-center">
             <div class="ripped-center-above hover-underline">
-              <input type="text" readonly="readonly" value="ddroller.tech/rolled/1a05" id="copy-field" style="width: calc(100% - 13px);" />
+              <input type="text" readonly="readonly" value="ddroller.tech/rolled/|< .SeqID | slug >|" id="copy-field" style="width: calc(100% - 13px); font-size: 19px;" />
             </div>
             <div class="ripped-center-line"></div>
             <div class="ripped-center-below">PERMANENT URL</div>
@@ -80,12 +90,17 @@
           </div>
         </div>
         <div class="layout6">
-          <div class="succeeded">
-            <div class="succeeded-content">|< .Result.Succeeded | succeeded >|</div>
-            <div class="succeeded-label">SUCCESS</div>
+          <div class="ripped-center">
+            <a class="ripped-center-above hover-underline" href="/roll/|< .Request.Text >|">◈|< .Request.Text >|</a>
+            <div class="ripped-center-line"></div>
+            <div class="ripped-center-below">ROLL AGAIN</div>
+          </div>
+          <div class="ripped-center">
+            <a class="ripped-center-above hover-underline" href="https://www.amazon.com/s/ref=nb_sb_noss_1?field-keywords=polyhedral+dice+set">◈Buy Dice</a>
+            <div class="ripped-center-line"></div>
+            <div class="ripped-center-below">AMAZON</div>
           </div>
         </div>
-        <div class="layout7"></div>
       </div>
     </div>
   <script>

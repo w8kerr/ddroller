@@ -15,6 +15,7 @@ import (
   "net"
   "strings"
   "html/template"
+  "math"
 )
 
 //Error values for parsing roll requests.
@@ -34,29 +35,32 @@ var SupportedDice = map[int]bool {
   6: true,
   8: true,
   10: true,
+  12: true,
   20: true,
-  100: true,
 }
 
 //Definition for a roll request.
-//Roll [count] dice with [sides], add [modified],
-//and succeed if the result is above [success],
-//or below [success] if [reverse_success] is true.
+//Roll [Count] dice with [Sides], add [Modifier],
+//and succeed if the result is above or equal to [Success],
+//or below or equal to [Success] if [Reverse_success] is true.
+//[Text] is the original request as it was received.
 type RollDef struct {
   Count int             `bson:"count"`
   Sides int             `bson:"sides"`
   Modifier int          `bson:"modifier"`
   Success int           `bson:"success"`
   Reverse_success bool  `bson:"reverse_success"`
+  Text string           `bson:"text"`
 }
 
 //Definition for a roll result.
-//[rolls] contains each individual roll, [total] contains the sum including the
-//roll modifier, and [succeeded] is true if the roll met its success threshold.
+//[Rolls] contains each individual roll, [Total] contains the sum including the
+//roll modifier, and [Succeeded] is positive if the roll met its success
+//threshold, negative if it didn't, or 0 if no threshold was given.
 type RollResult struct {
   Rolls []int           `bson:"rolls"`
   Total int             `bson:"total"`
-  Succeeded bool        `bson:"succeeded"`
+  Succeeded int         `bson:"succeeded"`
 }
 
 //Definition for a roll result record.
@@ -97,6 +101,8 @@ func main() {
     "modifier": FormatModifier,
     "success": FormatSuccess,
     "succeeded": FormatSucceededSymbol,
+    "dicebasis": CalculateDiceBasis,
+    "slug": IDToSlug,
   })
 
   server.Delims("|<", ">|")
@@ -229,6 +235,7 @@ func ParseRoll(request string) (def RollDef, err int) {
     return def, RollError_UnsupportedFormat
   } else {
     err = -1
+    def.Text = request
     parsed_request := roll_matcher.FindStringSubmatch(request)
     count, _ := strconv.Atoi(parsed_request[1])
     sides, _ := strconv.Atoi(parsed_request[2])
@@ -288,10 +295,18 @@ func PerformRoll(def RollDef) RollResult {
   if def.Success != 0 {
     if def.Reverse_success {
       //Reversed success: succeed if the total is <= the threshold
-      res.Succeeded = res.Total <= def.Success
+      if res.Total <= def.Success {
+        res.Succeeded = 1
+      } else {
+        res.Succeeded = -1
+      }
     } else {
       //Normal success: succeed if the total is >= the threshold
-      res.Succeeded = res.Total >- def.Success
+      if res.Total >= def.Success {
+        res.Succeeded = 1
+      } else {
+        res.Succeeded = -1
+      }
     }
   }
 
@@ -416,12 +431,30 @@ func FormatSuccess(success int) string {
   }
 }
 
-//FormatSucceededSymbol takes a boolean representing success and returns a single letter
-//representation of that success - "S" for success and "F" for failure.
-func FormatSucceededSymbol(succeeded bool) string {
-  if succeeded {
-    return "S"
+//FormatSucceededSymbol takes a int representing success (-1 for failure, 0 for
+//no threshold specified, and 1 for success) and returns a string representation
+//of the judgment.
+func FormatSucceededSymbol(succeeded int) string {
+  if succeeded > 0 {
+    return "SUCCESS"
+  } else if succeeded < 0  {
+    return "FAILURE"
   } else {
-    return "F"
+    return "RESULT"
   }
+}
+
+//CalculateDiceBasis calculates a flex-basis CSS property for dice in the dice
+//box bases on the number of dice there. This makes it so lines of dice in the
+//dice box stay fairly small until there are tons of dice there.
+func CalculateDiceBasis(num_dice int) int {
+  fmt.Println("Got ", num_dice, " dice")
+  general_size := math.Sqrt(float64(num_dice))
+  general_size = general_size * 1.5
+  fmt.Println(general_size, " is sqrt")
+  general_size = math.Floor(general_size)
+  fmt.Println(general_size, " per line")
+  percentage := 100 / general_size
+  fmt.Println(percentage, " basis")
+  return int(percentage)
 }

@@ -82,8 +82,10 @@ input::placeholder {
     opacity: 0.2;
 }
 
-.header-link {
+a.header-link {
   font-size: 22px;
+}
+a {
   color: black;
   text-decoration: none;
 }
@@ -134,14 +136,15 @@ input::placeholder {
   border-image-slice: 13;
   border-image-width: 13;
   border-image-repeat: repeat;
-  text-align: center;
-  font-size: 72px;
   width: 368px;
-  height: 72px;
-  padding: 48px 17px 60px;
+  height: 105px;
+  padding: 17px 17px 31px;
   margin: auto;
+}
+.large-labeled-content {
   text-overflow: ellipsis;
   overflow: hidden;
+  font-size: 56px;
 }
 .large-labeled-label {
   position: absolute;
@@ -155,18 +158,20 @@ input::placeholder {
 
 .gray-group {
   border: 2px solid transparent;
-  border-image-source: url("/static/img/gray-group.svg");
+  border-image-source: url("/static/img/gray-bg.svg");
   border-image-slice: 34;
   border-image-width: 34;
   border-image-repeat: repeat;
   background-color: #deddde;
   background-clip: content-box;
-  padding: 16px;
+  padding: 8px 6px;
   width: 370px;
   display: flex;
   flex-flow: row wrap;
   justify-content: space-evenly;
   margin-top: 4px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .featured-number {
@@ -176,7 +181,7 @@ input::placeholder {
   position: relative;
   width: 172px;
   height: 58px;
-  margin: 6px auto;
+  margin: 3px auto;
 }
 .featured-number-number {
   position: absolute;
@@ -197,6 +202,56 @@ input::placeholder {
   font-size: 16px;
 }
 
+.fancy {
+  position: relative;
+  border: 2px solid transparent;
+  border-image-source: url("/static/img/fancy.svg");
+  border-image-slice: 55;
+  border-image-width: 55;
+  border-image-repeat: repeat;
+  min-height: 165px;
+  min-width: 408px;
+  max-width: 840px;
+  margin: 20px;
+}
+.dice-pile {
+  padding: 20px;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-around;
+}
+.die-and-value {
+  display: block;
+  width: 72px;
+  height: auto;
+  margin: 8px;
+}
+.die-value {
+  text-align: center;
+  width: 72px;
+  height: 72px;
+  background-size: 72px 72px;
+  font-family: sans-serif;
+  font-weight: bold;
+  font-size: 30px;
+  margin: auto;
+}
+.d4-adjust {
+  padding-top: 18px;
+}
+.d6-adjust {
+  font-size: 44px;
+}
+.d8-adjust {
+  padding-bottom: 4px;
+}
+.d10-adjust {
+}
+.d12-adjust {
+}
+.d20-adjust {
+}
+
 .ripped-center {
   position: relative;
   border: 2px solid transparent;
@@ -205,10 +260,10 @@ input::placeholder {
   border-image-width: 35;
   border-image-repeat: repeat;
   font-size: 40px;
-  width: 240px;
+  min-width: 228px;
   height: 70px;
   padding: 0px 10px;
-  margin: auto;
+  margin: 0px 8px;
 }
 .ripped-center-above {
   position: absolute;
@@ -234,27 +289,27 @@ input::placeholder {
 
 .result {
   position: relative;
-  background-image: url("/static/img/shield.svg");
+  background-image: url("/static/img/emblem-oversize.svg");
   background-repeat: no-repeat;
   background-size: 100% 100%;
-  width: 150px;
+  width: 198px;
   height: 150px;
-  margin: auto;
+  margin: 0px auto 8px;
 }
 .result-content {
   position: absolute;
   font-size: 72px;
-  bottom: 40px;
-  left: 26px;
-  right: 26px;
+  bottom: 52px;
+  left: 14px;
+  right: 14px;
   text-align: center;
 }
 .result-label {
   position: absolute;
   font-size: 14px;
-  bottom: 30px;
-  left: 54px;
-  right: 54px;
+  bottom: 18px;
+  left: 66px;
+  right: 66px;
   text-align: center;
 }
 

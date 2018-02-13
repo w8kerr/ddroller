@@ -11,52 +11,46 @@
 .layout3 {
   flex-basis: 100%;
   order: 3;
+  justify-content: center;
+  display: flex;
 }
 .layout4 {
-  flex-basis: 40%;
+  flex-basis: 33%;
   order: 4;
 }
 .layout5 {
-  flex-basis: 20%;
+  flex-basis: 34%;
   order: 5;
 }
 .layout6 {
-  flex-basis: 20%;
+  flex-basis: 33%;
   order: 6;
-}
-.layout7 {
-  flex-basis: 20%;
-  order: 7;
 }
 
 /* Completely different layout for smaller screens, shows result first */
 @media all and (max-width: 959px) {
   .layout5 {
-    flex-basis: 50%;
+    flex-basis: 100%;
     order: 1;
   }
   .layout6 {
-    flex-basis: 50%;
+    flex-basis: 100%;
     order: 2;
-  }
-  .layout7 {
-    flex-basis: 0%;
-    order: 3;
   }
   .layout1 {
     flex-basis: 100%;
-    order: 4;
+    order: 3;
   }
   .layout2 {
     flex-basis: 100%;
-    order: 5;
+    order: 4;
   }
   .layout3 {
     flex-basis: 100%;
-    order: 6;
+    order: 5;
   }
   .layout4 {
     flex-basis: 100%;
-    order: 7;
+    order: 6;
   }
 }
