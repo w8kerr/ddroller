@@ -60,14 +60,17 @@
           </div>
         </div>
         <div class="layout4">
-          <div class="invisible-group layout-3">
-            <div class="ripped-center hover-underline">
-              PERMALINK
+          <div class="ripped-center">
+            <div class="ripped-center-above hover-underline">◈This Roll</div>
+            <div class="ripped-center-line"></div>
+            <div class="ripped-center-below">PERMANENT LINK</div>
+          </div>
+          <div class="ripped-center">
+            <div class="ripped-center-above hover-underline">
+              <input type="text" readonly="readonly" value="ddroller.tech/rolled/1a05" id="copy-field" style="width: calc(100% - 13px);" />
             </div>
-            <div class="ripped-center hover-underline">
-              COPY:
-              <input type="text" value="https://ddroller.tech/rolled/1a05" class="copy-input" />
-            </div>
+            <div class="ripped-center-line"></div>
+            <div class="ripped-center-below">PERMANENT URL</div>
           </div>
         </div>
         <div class="layout5">
@@ -82,10 +85,26 @@
             <div class="succeeded-label">SUCCESS</div>
           </div>
         </div>
+        <div class="layout7"></div>
       </div>
     </div>
   <script>
-    document.getElementById("body").classList.remove("prevent-transitions")
+    document.getElementById("body").classList.remove("prevent-transitions");
+    var copy_field = document.getElementById("copy-field");
+    copy_field.onclick = function() {
+      //Copy text to clipboard
+      copy_field.select();
+      document.execCommand("Copy");
+
+      //Make an outline that fades
+      copy_field.classList.add("fading-outline");
+      setTimeout(function() {
+        copy_field.classList.add("fade-outline");
+      }, 1)
+      setTimeout(function() {
+        copy_field.classList.remove("fading-outline", "fade-outline");
+      }, 500)
+    }
   </script>
   </body>
 </html>

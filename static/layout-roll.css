@@ -13,16 +13,20 @@
   order: 3;
 }
 .layout4 {
-  flex-basis: 34%;
+  flex-basis: 40%;
   order: 4;
 }
 .layout5 {
-  flex-basis: 33%;
+  flex-basis: 20%;
   order: 5;
 }
 .layout6 {
-  flex-basis: 33%;
+  flex-basis: 20%;
   order: 6;
+}
+.layout7 {
+  flex-basis: 20%;
+  order: 7;
 }
 
 /* Completely different layout for smaller screens, shows result first */
@@ -35,20 +39,24 @@
     flex-basis: 50%;
     order: 2;
   }
-  .layout1 {
-    flex-basis: 100%;
+  .layout7 {
+    flex-basis: 0%;
     order: 3;
   }
-  .layout2 {
+  .layout1 {
     flex-basis: 100%;
     order: 4;
   }
-  .layout3 {
+  .layout2 {
     flex-basis: 100%;
     order: 5;
   }
-  .layout4 {
+  .layout3 {
     flex-basis: 100%;
     order: 6;
+  }
+  .layout4 {
+    flex-basis: 100%;
+    order: 7;
   }
 }

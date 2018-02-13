@@ -67,16 +67,19 @@ div.page {
 input.roll-input {
   height: 29px;
   width: 284px;
+}
+
+input {
   padding-left: 3px;
   padding-top: 3px;
   padding-bottom: 0px;
   font-size: 22px;
   border: 0;
 }
-input.roll-input:focus {
+input:focus {
 }
-input.roll-input::placeholder {
-  opacity: 0.2;
+input::placeholder {
+    opacity: 0.2;
 }
 
 .header-link {
@@ -194,21 +197,39 @@ input.roll-input::placeholder {
   font-size: 16px;
 }
 
-.invisible-group {
-  display: block;
-}
-
 .ripped-center {
+  position: relative;
   border: 2px solid transparent;
-  border-image-source: url("/static/img/gray-group.svg");
+  border-image-source: url("/static/img/ripped-center.svg");
   border-image-slice: 35;
   border-image-width: 35;
   border-image-repeat: repeat;
   font-size: 40px;
   width: 240px;
   height: 70px;
-  text-align: center;
+  padding: 0px 10px;
+  margin: auto;
+}
+.ripped-center-above {
+  position: absolute;
+  left: 10px;
+  bottom: 26px;
   font-size: 24px;
+}
+.ripped-center-line {
+  position: absolute;
+  border-bottom: 0.4px solid #b2b1b1;
+  left: 10px;
+  right: 10px;
+  top: 25px;
+  bottom: 25px;
+  z-index: -1;
+}
+.ripped-center-below {
+  position: absolute;
+  left: 10px;
+  bottom: 8px;
+  font-size: 14px;
 }
 
 .result {
@@ -218,6 +239,7 @@ input.roll-input::placeholder {
   background-size: 100% 100%;
   width: 150px;
   height: 150px;
+  margin: auto;
 }
 .result-content {
   position: absolute;
@@ -241,24 +263,25 @@ input.roll-input::placeholder {
   background-image: url("/static/img/square.svg");
   background-repeat: no-repeat;
   background-size: 100% 100%;
-  width: 70px;
-  height: 70px;
+  width: 105px;
+  height: 105px;
+  margin: 22px auto;
 }
 .succeeded-content {
   position: absolute;
-  font-size: 36px;
-  top: 10px;
-  bottom: 24px;
-  left: 10px;
-  right: 10px;
+  font-size: 54px;
+  top: 15px;
+  bottom: 36px;
+  left: 15px;
+  right: 15px;
   text-align: center;
 }
 .succeeded-label {
   position: absolute;
   font-size: 14px;
-  bottom: 6px;
-  left: 10px;
-  right: 10px;
+  bottom: 9px;
+  left: 15px;
+  right: 15px;
   text-align: center;
 }
 
@@ -266,4 +289,11 @@ input.roll-input::placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.fading-outline {
+  outline: black auto 2px;
+  transition: outline 0.5s;
+}
+.fade-outline {
+  outline: transparent auto 2px;
 }
