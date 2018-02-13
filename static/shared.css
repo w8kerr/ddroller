@@ -76,8 +76,8 @@ input {
   font-size: 22px;
   border: 0;
 }
-input:focus {
-}
+/* input:focus {
+} */
 input::placeholder {
     opacity: 0.2;
 }
@@ -245,12 +245,12 @@ a {
 .d8-adjust {
   padding-bottom: 4px;
 }
-.d10-adjust {
+/* .d10-adjust {
 }
 .d12-adjust {
 }
 .d20-adjust {
-}
+} */
 
 .ripped-center {
   position: relative;
