@@ -92,7 +92,13 @@ func main() {
 
   //Run the web server
   server := gin.Default()
-  server.SetFuncMap(template.FuncMap{"add": AddTwoNumbers})
+  server.SetFuncMap(template.FuncMap{
+    "add": AddTwoNumbers,
+    "modifier": FormatModifier,
+    "success": FormatSuccess,
+    "succeeded": FormatSucceededSymbol,
+  })
+
   server.Delims("|<", ">|")
   server.LoadHTMLGlob("templates/*")
 
@@ -385,4 +391,37 @@ func LoadDatabaseCredentials(file_path string) Credentials {
 //be able to add things. Very annoying that that isn't possible by default.
 func AddTwoNumbers(first int, second int) int {
   return first + second
+}
+
+//FormatModifier takes a modifier defined as an int and formats it as a string.
+//This mainly involves forcing a "+" at the beginning for non-negative numbers.
+func FormatModifier(modifier int) string {
+  if modifier < 0 {
+    return strconv.Itoa(modifier)
+  } else {
+    return "+" + strconv.Itoa(modifier)
+  }
+}
+
+//FormatSuccess takes a success threshold as an int and formats it as a string.
+//This involves placing the sign of the integer after the decimal representation,
+//end returning a special symbol when no threshold is defined.
+func FormatSuccess(success int) string {
+  if success < 0 {
+    return strconv.Itoa(-1 * success) + "-"
+  } else if success == 0 {
+    return "∅"
+  } else {
+    return strconv.Itoa(success) + "+"
+  }
+}
+
+//FormatSucceededSymbol takes a boolean representing success and returns a single letter
+//representation of that success - "S" for success and "F" for failure.
+func FormatSucceededSymbol(succeeded bool) string {
+  if succeeded {
+    return "S"
+  } else {
+    return "F"
+  }
 }

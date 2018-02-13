@@ -1,19 +1,87 @@
+<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" type="text/css" href="/static/shared.css">
+    <link rel="stylesheet" type="text/css" href="/static/layout-roll.css">
   </head>
   <body class="prevent-transitions">
     <div id="body" class="page">
       |< template "header" >|
-      <div class="page-box">
-        <p>Sequence ID: |< .SeqID >|</p>
-        <ul>
-          |< range $i, $roll := .Result.Rolls >|
-          <li>Roll |< add $i 1 >|: |< $roll >|</li>
-          |< end >|
-        </ul>
-        <p>Total: |< .Result.Total >|</p>
-        <p>{{ Now AngularJS can deal with these tags on its own }}</p>
+      <div class="page-box page-layout">
+        <div class="layout1">
+          <div class="large-labeled">
+            |< .Request.Count >|d|< .Request.Sides >|
+            <div class="large-labeled-label">REQUEST</div>
+          </div>
+        </div>
+        <div class="layout2">
+          <div class="gray-group">
+            <div style="flex-basis: 50%;">
+              <div class="featured-number">
+                <div class="featured-number-number">|< .Request.Count >|</div>
+                <div class="featured-number-label">NUMBER OF DICE</div>
+              </div>
+            </div>
+            <div style="flex-basis: 50%;">
+              <div class="featured-number">
+                <div class="featured-number-number flex-vertical-center">
+                  <div>|< .Request.Sides >|</div>
+                </div>
+                <div class="featured-number-label flex-vertical-center">
+                  <div>SIDES OF DICE</div>
+                </div>
+              </div>
+            </div>
+            <div style="flex-basis: 50%;">
+              <div class="featured-number">
+                <div class="featured-number-number flex-vertical-center">
+                  <div>|< .Request.Modifier >|</div>
+                </div>
+                <div class="featured-number-label flex-vertical-center">
+                  <div>MODIFIER</div>
+                </div>
+              </div>
+            </div>
+            <div style="flex-basis: 50%;">
+              <div class="featured-number">
+                <div class="featured-number-number flex-vertical-center">
+                  <div>|< .Request.Success | success >|</div>
+                </div>
+                <div class="featured-number-label flex-vertical-center">
+                  <div>SUCCEED ON</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="layout3">
+          <div class="fancy">
+            Some stuff will go here soon
+          </div>
+        </div>
+        <div class="layout4">
+          <div class="invisible-group layout-3">
+            <div class="ripped-center hover-underline">
+              PERMALINK
+            </div>
+            <div class="ripped-center hover-underline">
+              COPY:
+              <input type="text" value="https://ddroller.tech/rolled/1a05" class="copy-input" />
+            </div>
+          </div>
+        </div>
+        <div class="layout5">
+          <div class="result">
+            <div class="result-content">|< .Result.Total >|</div>
+            <div class="result-label">RESULT</div>
+          </div>
+        </div>
+        <div class="layout6">
+          <div class="succeeded">
+            <div class="succeeded-content">|< .Result.Succeeded | succeeded >|</div>
+            <div class="succeeded-label">SUCCESS</div>
+          </div>
+        </div>
       </div>
     </div>
   <script>

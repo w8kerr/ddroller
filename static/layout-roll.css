@@ -1,0 +1,54 @@
+.layout1 {
+  flex-basis: 50%;
+  order: 1;
+}
+
+.layout2 {
+  flex-basis: 50%;
+  order: 2;
+}
+
+.layout3 {
+  flex-basis: 100%;
+  order: 3;
+}
+.layout4 {
+  flex-basis: 34%;
+  order: 4;
+}
+.layout5 {
+  flex-basis: 33%;
+  order: 5;
+}
+.layout6 {
+  flex-basis: 33%;
+  order: 6;
+}
+
+/* Completely different layout for smaller screens, shows result first */
+@media all and (max-width: 959px) {
+  .layout5 {
+    flex-basis: 50%;
+    order: 1;
+  }
+  .layout6 {
+    flex-basis: 50%;
+    order: 2;
+  }
+  .layout1 {
+    flex-basis: 100%;
+    order: 3;
+  }
+  .layout2 {
+    flex-basis: 100%;
+    order: 4;
+  }
+  .layout3 {
+    flex-basis: 100%;
+    order: 5;
+  }
+  .layout4 {
+    flex-basis: 100%;
+    order: 6;
+  }
+}
