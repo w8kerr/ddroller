@@ -42,14 +42,13 @@ var SupportedDice = map[int]bool {
 //Definition for a roll request.
 //Roll [Count] dice with [Sides], add [Modifier],
 //and succeed if the result is above or equal to [Success],
-//or below or equal to [Success] if [Reverse_success] is true.
+//or below or equal to the absolute value of [Success] if [Success] is negative.
 //[Text] is the original request as it was received.
 type RollDef struct {
   Count int             `bson:"count"`
   Sides int             `bson:"sides"`
   Modifier int          `bson:"modifier"`
   Success int           `bson:"success"`
-  Reverse_success bool  `bson:"reverse_success"`
   Text string           `bson:"text"`
 }
 
@@ -71,6 +70,7 @@ type RollRecord struct {
   User string           `bson:"user"`
   Time string           `bson:"time"`
   SeqID int64           `bson:"seqid"`
+  Permalink bool //theoretically this should never be put in the databse
 }
 
 //Definition for a username/password pair.
@@ -169,6 +169,7 @@ func SP_RollPermalink(context *gin.Context) {
   c := mongo.DB("ddroller-dev").C("rolls")
   c.Find(bson.M{"seqid": id}).One(&result)
 
+  result.Permalink = true;
   context.HTML(http.StatusOK, "roll.tmpl", result)
 }
 
@@ -229,7 +230,14 @@ func SJ_RollList(context *gin.Context) {
 //It returns a RollDef struct containing that information,
 //and an error on failure.
 func ParseRoll(request string) (def RollDef, err int) {
-  roll_matcher, _ := regexp.Compile(`(?P<count>\d+)d(?P<sides>\d+)`)
+  //Regex to parse roll definitions
+  //Matches:
+  //1 - count
+  //2 - sides
+  //3 - modifier
+  //4 - success threshold number
+  //5 - either "+" or "-" (or nothing) after the success threshold
+  roll_matcher, _ := regexp.Compile(`(\d+)d(\d+)([-+]\d+)?(?:\|(\d+)([-+])?)?`)
 
   if !roll_matcher.MatchString(request) {
     return def, RollError_UnsupportedFormat
@@ -237,22 +245,22 @@ func ParseRoll(request string) (def RollDef, err int) {
     err = -1
     def.Text = request
     parsed_request := roll_matcher.FindStringSubmatch(request)
-    count, _ := strconv.Atoi(parsed_request[1])
-    sides, _ := strconv.Atoi(parsed_request[2])
+    def.Count, _ = strconv.Atoi(parsed_request[1])
+    def.Sides, _ = strconv.Atoi(parsed_request[2])
+    def.Modifier, _ = strconv.Atoi(parsed_request[3])
+    def.Success, _ = strconv.Atoi(parsed_request[4])
 
-    def.Count = count
-    if count > DiceCountLimit {
+    if def.Count > DiceCountLimit {
       err = RollError_RequestTooLarge
     }
 
-    def.Sides = sides
-    if !SupportedDice[sides] {
+    if !SupportedDice[def.Sides] {
       err = RollError_UnsupportedDice
     }
 
-    def.Modifier = 0
-    def.Success = 0
-    def.Reverse_success = false
+    if(parsed_request[5] == "-") {
+      def.Success = def.Success * -1
+    }
 
     return def, err
   }
@@ -293,9 +301,9 @@ func PerformRoll(def RollDef) RollResult {
 
   res.Total = roll_total + def.Modifier
   if def.Success != 0 {
-    if def.Reverse_success {
+    if def.Success < 0 {
       //Reversed success: succeed if the total is <= the threshold
-      if res.Total <= def.Success {
+      if res.Total <= (def.Success * -1) {
         res.Succeeded = 1
       } else {
         res.Succeeded = -1
@@ -448,13 +456,9 @@ func FormatSucceededSymbol(succeeded int) string {
 //box bases on the number of dice there. This makes it so lines of dice in the
 //dice box stay fairly small until there are tons of dice there.
 func CalculateDiceBasis(num_dice int) int {
-  fmt.Println("Got ", num_dice, " dice")
   general_size := math.Sqrt(float64(num_dice))
   general_size = general_size * 1.5
-  fmt.Println(general_size, " is sqrt")
   general_size = math.Floor(general_size)
-  fmt.Println(general_size, " per line")
   percentage := 100 / general_size
-  fmt.Println(percentage, " basis")
   return int(percentage)
 }

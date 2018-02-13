@@ -352,3 +352,7 @@ a {
 .fade-outline {
   outline: transparent auto 2px;
 }
+
+.grayed-out {
+  color: #deddde;
+}

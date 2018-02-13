@@ -35,7 +35,7 @@
             <div style="flex-basis: 50%;">
               <div class="featured-number">
                 <div class="featured-number-number flex-vertical-center">
-                  <div>|< .Request.Modifier >|</div>
+                  <div>|< .Request.Modifier | modifier >|</div>
                 </div>
                 <div class="featured-number-label flex-vertical-center">
                   <div>MODIFIER</div>
@@ -44,7 +44,7 @@
             </div>
             <div style="flex-basis: 50%;">
               <div class="featured-number">
-                <div class="featured-number-number flex-vertical-center">
+                <div class="featured-number-number flex-vertical-center |< if (eq .Request.Success 0) >|grayed-out|< end >|">
                   <div>|< .Request.Success | success >|</div>
                 </div>
                 <div class="featured-number-label flex-vertical-center">
@@ -70,6 +70,18 @@
           </div>
         </div>
         <div class="layout4">
+          |< if .Permalink >|
+          <div class="ripped-center">
+            <div class="ripped-center-above">|< .User >|</div>
+            <div class="ripped-center-line"></div>
+            <div class="ripped-center-below">USER</div>
+          </div>
+          <div class="ripped-center">
+            <div class="ripped-center-above">|< .Time >|</div>
+            <div class="ripped-center-line"></div>
+            <div class="ripped-center-below">TIME</div>
+          </div>
+          |< else >|
           <div class="ripped-center">
             <a class="ripped-center-above hover-underline" href="/rolled/|< .SeqID | slug >|">◈This Roll</a>
             <div class="ripped-center-line"></div>
@@ -82,11 +94,12 @@
             <div class="ripped-center-line"></div>
             <div class="ripped-center-below">PERMANENT URL</div>
           </div>
+          |< end >|
         </div>
         <div class="layout5">
           <div class="result">
             <div class="result-content">|< .Result.Total >|</div>
-            <div class="result-label">RESULT</div>
+            <div class="result-label">|< .Result.Succeeded | succeeded >|</div>
           </div>
         </div>
         <div class="layout6">
