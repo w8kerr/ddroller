@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html ng-app="ddrollerApp">
+  <head>
+    <link rel="stylesheet" type="text/css" href="/static/shared.css">
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.7/angular.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.7/angular-route.min.js"></script>
+    <script type="text/javascript" src="/static/controller/roll_list.js"></script>
+  <body class="prevent-transitions">
+    |{ template "header" }|
+    <div class="page-box" ng-controller="RollListController">
+      <div class="list-options">
+        <div class="vertical-labeled">
+          <div class="vertical-labeled-content">
+            <input type="text" placeholder="User" id="user-input" />
+          </div>
+          <div class="vertical-labeled-label">FILTER</div>
+        </div>
+        <div class="vertical-labeled">
+          <div class="vertical-labeled-content">
+            <a>&lt;</a><a>&gt;</a>
+          </div>
+          <div class="vertical-labeled-label">ENTRIES: 1 to 20</div>
+        </div>
+      </div>
+      <div class="list-box">
+        <div class="roll-record" ng-repeat="record in records">
+          Roll: {{ record.SeqID }}
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

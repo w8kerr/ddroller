@@ -5,15 +5,15 @@
   </head>
   <body class="prevent-transitions">
     <div id="body" class="page">
-      |< template "header" >|
+      |{ template "header" }|
       <div class="page-box">
-        <p>Sequence ID: |< .SeqID >|</p>
+        <p>Sequence ID: |{ .SeqID }|</p>
         <ul>
-          |< range $i, $roll := .Result.Rolls >|
-          <li>Roll |< add $i 1 >|: |< $roll >|</li>
-          |< end >|
+          |{ range $i, $roll := .Result.Rolls }|
+          <li>Roll |{ add $i 1 }|: |{ $roll }|</li>
+          |{ end }|
         </ul>
-        <p>Total: |< .Result.Total >|</p>
+        <p>Total: |{ .Result.Total }|</p>
       </div>
     </div>
   <script>

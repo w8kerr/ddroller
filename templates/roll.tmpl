@@ -6,11 +6,11 @@
   </head>
   <body class="prevent-transitions">
     <div id="body" class="page">
-      |< template "header" >|
-      <div class="page-box page-layout">
+      |{ template "header" }|
+      <div class="page-box">
         <div class="layout1">
           <div class="large-labeled flex-vertical-center">
-            <div class="large-labeled-content">|< .Request.Text >|</div>
+            <div class="large-labeled-content">|{ .Request.Text }|</div>
             <div class="large-labeled-label">REQUEST</div>
           </div>
         </div>
@@ -18,14 +18,14 @@
           <div class="gray-group">
             <div style="flex-basis: 50%;">
               <div class="featured-number">
-                <div class="featured-number-number">|< .Request.Count >|</div>
+                <div class="featured-number-number">|{ .Request.Count }|</div>
                 <div class="featured-number-label flex-vertical-center">NUMBER OF DICE</div>
               </div>
             </div>
             <div style="flex-basis: 50%;">
               <div class="featured-number">
                 <div class="featured-number-number flex-vertical-center">
-                  <div>|< .Request.Sides >|</div>
+                  <div>|{ .Request.Sides }|</div>
                 </div>
                 <div class="featured-number-label flex-vertical-center">
                   <div>SIDES OF DICE</div>
@@ -35,7 +35,7 @@
             <div style="flex-basis: 50%;">
               <div class="featured-number">
                 <div class="featured-number-number flex-vertical-center">
-                  <div>|< .Request.Modifier | modifier >|</div>
+                  <div>|{ .Request.Modifier | modifier }|</div>
                 </div>
                 <div class="featured-number-label flex-vertical-center">
                   <div>MODIFIER</div>
@@ -44,8 +44,8 @@
             </div>
             <div style="flex-basis: 50%;">
               <div class="featured-number">
-                <div class="featured-number-number flex-vertical-center |< if (eq .Request.Success 0) >|grayed-out|< end >|">
-                  <div>|< .Request.Success | success >|</div>
+                <div class="featured-number-number flex-vertical-center |{ if (eq .Request.Success 0) }|grayed-out|{ end }|">
+                  <div>|{ .Request.Success | success }|</div>
                 </div>
                 <div class="featured-number-label flex-vertical-center">
                   <div>SUCCEED ON</div>
@@ -57,54 +57,54 @@
         <div class="layout3">
           <div class="fancy flex-vertical-center">
             <div class="dice-pile">
-            |< $sides := .Request.Sides >|
-            |< $basis := (.Request.Count | dicebasis) >|
-            |< range .Result.Rolls >|
-              <div class="die-and-value" style="flex-basis: calc(|< $basis >|% - 16px);">
-                <div class="die-value flex-vertical-center" style="background-image: url('/static/img/d|< $sides >|.svg')">
-                  <div class="d|< $sides >|-adjust">|< . >|</div>
+            |{ $sides := .Request.Sides }|
+            |{ $basis := (.Request.Count | dicebasis) }|
+            |{ range .Result.Rolls }|
+              <div class="die-and-value" style="flex-basis: calc(|{ $basis }|% - 16px);">
+                <div class="die-value flex-vertical-center" style="background-image: url('/static/img/d|{ $sides }|.svg')">
+                  <div class="d|{ $sides }|-adjust">|{ . }|</div>
                 </div>
               </div>
-            |< end >|
+            |{ end }|
             </div>
           </div>
         </div>
         <div class="layout4">
-          |< if .Permalink >|
+          |{ if .Permalink }|
           <div class="ripped-center">
-            <div class="ripped-center-above">|< .User >|</div>
+            <div class="ripped-center-above">|{ .User }|</div>
             <div class="ripped-center-line"></div>
             <div class="ripped-center-below">USER</div>
           </div>
           <div class="ripped-center">
-            <div class="ripped-center-above">|< .Time >|</div>
+            <div class="ripped-center-above">|{ .Time }|</div>
             <div class="ripped-center-line"></div>
             <div class="ripped-center-below">TIME</div>
           </div>
-          |< else >|
+          |{ else }|
           <div class="ripped-center">
-            <a class="ripped-center-above hover-underline" href="/rolled/|< .SeqID | slug >|">◈This Roll</a>
+            <a class="ripped-center-above hover-underline" href="/rolled/|{ .SeqID | slug }|">◈This Roll</a>
             <div class="ripped-center-line"></div>
             <div class="ripped-center-below">PERMANENT LINK</div>
           </div>
           <div class="ripped-center">
             <div class="ripped-center-above hover-underline">
-              <input type="text" readonly="readonly" value="ddroller.tech/rolled/|< .SeqID | slug >|" id="copy-field" style="width: calc(100% - 13px); font-size: 19px;" />
+              <input type="text" readonly="readonly" value="ddroller.tech/rolled/|{ .SeqID | slug }|" id="copy-field" style="width: calc(100% - 13px); font-size: 19px;" />
             </div>
             <div class="ripped-center-line"></div>
             <div class="ripped-center-below">PERMANENT URL</div>
           </div>
-          |< end >|
+          |{ end }|
         </div>
         <div class="layout5">
           <div class="result">
-            <div class="result-content">|< .Result.Total >|</div>
-            <div class="result-label">|< .Result.Succeeded | succeeded >|</div>
+            <div class="result-content">|{ .Result.Total }|</div>
+            <div class="result-label">|{ .Result.Succeeded | succeeded }|</div>
           </div>
         </div>
         <div class="layout6">
           <div class="ripped-center">
-            <a class="ripped-center-above hover-underline" href="/roll/|< .Request.Text >|">◈|< .Request.Text >|</a>
+            <a class="ripped-center-above hover-underline" href="/roll/|{ .Request.Text }|">◈|{ .Request.Text }|</a>
             <div class="ripped-center-line"></div>
             <div class="ripped-center-below">ROLL AGAIN</div>
           </div>
