@@ -228,9 +228,9 @@ func SJ_RollList(context *gin.Context) {
 	err := iter.All(&results)
 
 	if err != nil {
-		context.SecureJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	} else {
-		context.SecureJSON(http.StatusOK, results)
+		context.JSON(http.StatusOK, results)
 	}
 }
 
