@@ -23,7 +23,6 @@ ddrollerApp.controller("RollListController", function RollListController($scope,
                 mostRecentSeqID = records[i].SeqID;
             }
         }
-        console.log(mostRecentSeqID);
     }
 
     function getRecordsSince(SeqID) {

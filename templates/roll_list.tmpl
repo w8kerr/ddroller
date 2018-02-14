@@ -5,6 +5,7 @@
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.7/angular.js"></script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.7/angular-route.js"></script>
     <script type="text/javascript" src="/static/ctl/roll_list.js"></script>
+    <script type="text/javascript" src="/static/src/filters.js"></script>
   <body class="prevent-transitions">
     |{ template "header" }|
     <div class="page-box" ng-controller="RollListController">
@@ -40,7 +41,7 @@
               <span class="record-label">Roll:</span>
               <span class="record-main">{{ record.Request.Text }}</span>
             </div>
-            <a class="auto-flex-ele record-main hover-underline"><span style="line-height: 18px">◈</span>Details</a>
+            <a class="auto-flex-ele record-main hover-underline" href="/rolled/{{ record.SeqID | idtoslug }}"><span style="line-height: 18px">◈</span>Details</a>
             <div class="auto-flex-ele"></div>
           </div>
           <div class="record-stacked-line">
@@ -50,7 +51,7 @@
               <div class="record-stacked-below record-label">USER</div>
             </div>
             <div class="auto-flex-ele record-stacked">
-              <div class="record-stacked-above record-main">{{ record.Time | date : "YY" }}</div>
+              <div class="record-stacked-above record-main">{{ record.Time | date:"M/d/yy h:mma" | lowercase }}</div>
               <div class="record-stacked-below record-label">TIME</div>
             </div>
             <div class="auto-flex-ele"></div>
@@ -60,7 +61,7 @@
           </div>
           <div class="record-result">
             <div class="record-result-content">{{ record.Result.Total }}</div>
-            <div class="record-result-label">RES</div>
+            <div class="record-result-label">{{ record.Result.succeeded | successshort }}</div>
           </div>
         </div>
       </div>

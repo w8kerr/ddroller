@@ -77,7 +77,7 @@
             <div class="ripped-center-below">USER</div>
           </div>
           <div class="ripped-center">
-            <div class="ripped-center-above">|{ .Time }|</div>
+            <div class="ripped-center-above">|{ .Time | date }|</div>
             <div class="ripped-center-line"></div>
             <div class="ripped-center-below">TIME</div>
           </div>
@@ -118,6 +118,7 @@
     </div>
   <script>
     document.getElementById("body").classList.remove("prevent-transitions");
+    |{ if not .Permalink }|
     var copy_field = document.getElementById("copy-field");
     copy_field.onclick = function() {
       //Copy text to clipboard
@@ -133,6 +134,7 @@
         copy_field.classList.remove("fading-outline", "fade-outline");
       }, 500)
     }
+    |{ end }|
   </script>
   </body>
 </html>

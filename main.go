@@ -105,6 +105,7 @@ func main() {
 		"succeeded": FormatSucceededSymbol,
 		"dicebasis": CalculateDiceBasis,
 		"slug":      IDToSlug,
+		"date":      FormatDate,
 	})
 
 	server.Delims("|{", "}|")
@@ -147,7 +148,7 @@ func SP_Roll(context *gin.Context) {
 			Result:  roll_result,
 			Request: roll_def,
 			User:    "w8kerr", //Eventually, this should be variable; hardcoded for now
-			Time:    time.Now().Format(time.RFC822),
+			Time:    time.Now().Format(time.RFC3339),
 			SeqID:   GetNextRollID(),
 		}
 
@@ -461,6 +462,14 @@ func FormatSucceededSymbol(succeeded int) string {
 	} else {
 		return "RESULT"
 	}
+}
+
+func FormatDate(fullDate string) string {
+	date, err := time.Parse(time.RFC3339, fullDate)
+	if err != nil {
+		return fullDate
+	}
+	return date.Format("1/2/06 3:04am")
 }
 
 //CalculateDiceBasis calculates a flex-basis CSS property for dice in the dice
