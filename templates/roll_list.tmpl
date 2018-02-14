@@ -4,27 +4,64 @@
     <link rel="stylesheet" type="text/css" href="/static/shared.css">
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.7/angular.js"></script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.7/angular-route.js"></script>
-    <script type="text/javascript" src="/static/controller/roll_list.js"></script>
+    <script type="text/javascript" src="/static/ctl/roll_list.js"></script>
   <body class="prevent-transitions">
     |{ template "header" }|
     <div class="page-box" ng-controller="RollListController">
       <div class="list-options">
-        <div class="vertical-labeled">
-          <div class="vertical-labeled-content">
-            <input type="text" placeholder="User" id="user-input" />
+        <div class="vertical-labeled" style="float: left;">
+          <div class="vertical-labeled-above">
+            <input class="hover-underline" type="text" placeholder="User" id="user-input" />
           </div>
-          <div class="vertical-labeled-label">FILTER</div>
+          <div class="vertical-labeled-center"></div>
+          <div class="vertical-labeled-below">FILTER</div>
         </div>
-        <div class="vertical-labeled">
-          <div class="vertical-labeled-content">
-            <a>&lt;</a><a>&gt;</a>
+        <div class="vertical-labeled" style="float: right;">
+          <div class="vertical-labeled-above" style="float: right;">
+            <div class="nav-button-container">
+              <div class="flex-vertical-center" style="height: 100%">
+                <a class="nav-button">◀</a>
+              </div>
+            </div>
+            <div class="nav-button-container">
+              <div class="flex-vertical-center" style="height: 100%">
+                <a class="nav-button">▶</a>
+              </div>
+            </div>
           </div>
-          <div class="vertical-labeled-label">ENTRIES: 1 to 20</div>
+          <div class="vertical-labeled-center" style="float: right;"></div>
+          <div class="vertical-labeled-below">ENTRIES: 1 to 20</div>
         </div>
       </div>
       <div class="list-box">
         <div class="roll-record" ng-repeat="record in records">
-          Roll: {{ record.SeqID }}
+          <div class="record-main-line">
+            <div class="auto-flex-ele">
+              <span class="record-label">Roll:</span>
+              <span class="record-main">{{ record.Request.Text }}</span>
+            </div>
+            <a class="auto-flex-ele record-main hover-underline"><span style="line-height: 18px">◈</span>Details</a>
+            <div class="auto-flex-ele"></div>
+          </div>
+          <div class="record-stacked-line">
+            <div class="record-stacked-divider"></div>
+            <div class="auto-flex-ele record-stacked">
+              <div class="record-stacked-above record-main">{{ record.User }}</div>
+              <div class="record-stacked-below record-label">USER</div>
+            </div>
+            <div class="auto-flex-ele record-stacked">
+              <div class="record-stacked-above record-main">{{ record.Time | date : "YY" }}</div>
+              <div class="record-stacked-below record-label">TIME</div>
+            </div>
+            <div class="auto-flex-ele"></div>
+          </div>
+          <div class="record-label-line">
+            
+          </div>
+          <div class="record-result">
+            <div class="record-result-content">{{ record.Result.Total }}</div>
+            <div class="record-result-label">RES</div>
+          </div>
         </div>
       </div>
     </div>

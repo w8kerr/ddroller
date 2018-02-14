@@ -16,51 +16,83 @@ div.page {
   width: 960px;
   height: 160px;
 }
+.header-content {
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  left: 390px;
+  right: 0px;
+}
+
+@media screen and (max-width: 959px) {
+  .header {
+    background-image: url("/static/img/header-mid.svg");
+    width: 568px;
+  }
+  .header-content {
+    left: 30px;
+  }
+  div.page {
+    width: 568px;
+  }
+}
+@media screen and (max-width: 567px) {
+  .header {
+    background-image: url("/static/img/header-smol.svg");
+    width: 510px;
+  }
+  .header-content {
+    left: 0px;
+  }
+  div.page {
+    width: 510px;
+  }
+}
 
 .header-line1a {
   position: absolute;
-  left: 418px;
+  left: 28px;
   bottom: 80px;
 }
 .header-line1b {
   position: absolute;
-  left: 464px;
+  left: 74px;
   bottom: 79px;
 }
 .header-line1c {
   position: absolute;
-  left: 751px;
+  left: 361px;
   bottom: 79px;
 }
 
 .header-line2a-above {
   position: absolute;
-  left: 418px;
+  left: 28px;
   bottom: 46px;
 }
 .header-line2a-below {
   position: absolute;
-  left: 418px;
+  left: 28px;
   top: calc(100% - 44px);
 }
 .header-line2b-above {
   position: absolute;
-  left: 560px;
+  left: 170px;
   bottom: 46px;
 }
 .header-line2b-below {
   position: absolute;
-  left: 560px;
+  left: 170px;
   top: calc(100% - 44px);
 }
 .header-line2c-above {
   position: absolute;
-  left: 751px;
+  left: 361px;
   bottom: 46px;
 }
 .header-line2c-below {
   position: absolute;
-  left: 751px;
+  left: 361px;
   top: calc(100% - 44px);
 }
 
@@ -119,11 +151,11 @@ a {
 
 @media screen and (max-width: 959px) {
   .page-box {
-    width: 408px;
+    width: 424px;
   }
 }
 
-@media screen and (max-width: 547px) {
+@media screen and (max-width: 567px) {
   .page-box {
     border: 0px;
     padding: 50px 0px 20px;
@@ -339,6 +371,138 @@ a {
   left: 15px;
   right: 15px;
   text-align: center;
+}
+
+.list-options {
+  position: relative;
+  display: inline-block;
+  width: 794px;
+}
+.vertical-labeled {
+  display: block;
+}
+.vertical-labeled-above {
+  margin-left: 4px;
+  margin-right: 4px;
+  display: inline-block;
+}
+.vertical-labeled-center {
+  height: 3px;
+  width: 100%;
+  border-bottom: 0.4px solid #b2b1b1;
+}
+.vertical-labeled-below {
+  margin-left: 4px;
+  margin-right: 4px;
+}
+.list-box {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-evenly;
+}
+.nav-button-container {
+  height: 29px;
+  width: 29px;
+  text-align: center;
+  display: inline-block;
+}
+.nav-button {
+  color: black;
+  padding: 4px 8px;
+}
+.nav-button:hover {
+  border: 2px solid transparent;
+  border-image-source: url("/static/img/large-labeled.svg");
+  border-image-slice: 13;
+  border-image-width: 13;
+  border-image-repeat: repeat;
+  transition: border 0.2s;
+}
+.roll-record {
+  position: relative;
+  border: 2px solid transparent;
+  border-image-source: url("/static/img/ripped-center.svg");
+  border-image-slice: 35;
+  border-image-width: 35;
+  border-image-repeat: repeat;
+  flex-basis: calc(50% - 16px);
+  margin: 8px 8px 12px;
+  padding-top: 4px;
+  padding-bottom: 10px;
+  padding-left: 16px;
+  padding-right: 132px;
+  max-width: 240px;
+  height: 60px;
+  display: flex;
+  flex-flow: row wrap;
+}
+.record-main-line {
+  width: 100%;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  margin-top: 2px;
+  border-bottom: 1px solid #b2b1b1;
+}
+.record-stacked-line {
+  width: 100%;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  margin-top: 6px;
+}
+.auto-flex-ele {
+  flex-basis: auto;
+  vertical-align: baseline;
+}
+.record-stacked {
+  display: block;
+}
+.record-stacked-divider {
+  position: absolute;
+  left: 16px;
+  right: 132px;
+  top: 53px;
+  border-bottom: 1px solid #b2b1b1;
+}
+.record-stacked-below {
+  line-height: 16px;
+}
+.record-main {
+  font-size: 18px;
+}
+.record-label {
+  font-size: 12px;
+}
+.record-result {
+  position: absolute;
+  background-image: url("/static/img/emblem-oversize.svg");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  width: 122px;
+  height: 86px;
+  bottom: -18px;
+  right: 10px;
+  margin: 0px auto 8px;
+}
+.record-result-content {
+  position: absolute;
+  font-size: 40px;
+  bottom: 28px;
+  left: 7px;
+  right: 7px;
+  text-align: center;
+}
+.record-result-label {
+  position: absolute;
+  font-size: 12px;
+  bottom: 7px;
+  left: 33px;
+  right: 33px;
+  text-align: center;
+}
+.stuff {
+  flex-basis: 33%
 }
 
 .flex-vertical-center {
